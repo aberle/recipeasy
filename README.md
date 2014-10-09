@@ -11,3 +11,4 @@ To-Do
 * Add simple filtering to randomized recipes (e.g. chicken recipes, chicken+pasta+legumes recipes, etc.)
 * Make recipe title clickable
 * Make clickable links open in new tabs, not replace current tab
+* Make bootstrap files point to CDN rather than local files (for easier deployment)
