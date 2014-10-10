@@ -52,12 +52,12 @@
     <div class="col-md-6 col-lg-6">
     <div class="panel panel-default">
       <div class="panel-heading">
-      <h4 class="panel-title"><b>{{ recipe_data.name }}</b></h4>
+      <a href="{{ recipe_data.link }}" style="color:black;" target="_blank"><h4 class="panel-title"><b>{{ recipe_data.name }}</b></h4></a>
       </div>
       <!-- /.panel-heading -->
 
       <div class="panel-body">
-        <a href="{{ recipe_data.link }}"><img src="{{ recipe_data.image }}" width="275" height="275" class="img-rounded img-responsive"/></a>
+        <a href="{{ recipe_data.link }}" target="_blank"><img src="{{ recipe_data.image }}" width="275" height="275" class="img-rounded img-responsive"/></a>
         <br>
         <p>{{ recipe_data.description }}</p>
         <br>
