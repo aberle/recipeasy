@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from bs4 import BeautifulSoup
 import urllib2
 from random import choice,randint
+import os
 
 app = Flask(__name__, static_url_path='')
 
@@ -48,4 +49,6 @@ def recipe(name=None):
   return render_template('result.html', recipe_data=recipe_info)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',debug=True)
+    # Bind to PORT if defined, otherwise default to 5000.
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', debug=True, port=port)
