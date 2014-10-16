@@ -1,4 +1,4 @@
-application: recipeasy
+application: recip-easy
 version: 1
 runtime: python27
 api_version: 1
@@ -13,7 +13,3 @@ libraries:
   version: "2.6"
 - name: markupsafe
   version: "0.15"
-- name: beautifulsoup4
-  version: "4.3"
-- name: Flask
-  version: "0.10"
