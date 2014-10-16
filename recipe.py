@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from bs4 import BeautifulSoup
 import urllib2
 from random import choice,randint
@@ -18,19 +18,27 @@ class Recipe():
 @app.route('/')
 def recipe(name=None):
 
-  '''url = 'http://foodgawker.com/page/1/?s_exclude=drinks&cats_inc%5B0%5D=No+Desserts'
-  request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36'})
-  site = urllib2.urlopen(request)
-  html = site.read()
+  filter_params = request.args.get('filter', '')
+  print 'filter =', filter_params
 
-  parsed_html = BeautifulSoup(html)
-  maxpage = int(parsed_html.body.find('div', attrs={'class' : 'post-section'}).attrs['data-maxpage'])
-  '''
-  new_page = str(randint(1, 7300))
+  maxpage = 17000
 
-  url = 'http://foodgawker.com/page/' + new_page + '/?s_exclude=drinks&cats_inc%5B0%5D=No+Desserts'
-  request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36'})
-  site = urllib2.urlopen(request)
+  if filter_params != '':
+    url = 'http://foodgawker.com/page/' + '1' + '/?cats_inc%5B0%5D='+filter_params
+    print url
+    rq = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36'})
+    site = urllib2.urlopen(rq)
+    html = site.read()
+
+    parsed_html = BeautifulSoup(html)
+    maxpage = int(parsed_html.body.find('div', attrs={'class' : 'post-section'}).attrs['data-maxpage'])
+
+  new_page = str(randint(1, maxpage))
+  url = 'http://foodgawker.com/page/' + new_page + '/?cats_inc%5B0%5D='+filter_params
+  print url
+
+  rq = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36'})
+  site = urllib2.urlopen(rq)
   html = site.read()
 
   parsed_html = BeautifulSoup(html)
