@@ -3,7 +3,7 @@ import urllib2
 from random import choice,randint
 from pymongo import MongoClient
 
-url = 'http://foodgawker.com/page/1/?s_exclude=drinks&cats_inc%5B0%5D=No+Desserts'
+url = 'http://foodgawker.com/page/1/?s_exclude=drinks'
 request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36'})
 site = urllib2.urlopen(request)
 html = site.read()
@@ -11,36 +11,31 @@ html = site.read()
 parsed_html = BeautifulSoup(html)
 maxpage = int(parsed_html.body.find('div', attrs={'class' : 'post-section'}).attrs['data-maxpage'])
 
-new_page = str(randint(1, maxpage))
+for x in xrange(1, maxpage):
 
-url = 'http://foodgawker.com/page/' + new_page + '/?s_exclude=drinks&cats_inc%5B0%5D=No+Desserts'
-request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36'})
-site = urllib2.urlopen(request)
-html = site.read()
+    url = 'http://foodgawker.com/page/' + str(x) + '/?s_exclude=drinks&cats_inc%5B0%5D=No+Desserts'
+    request = urllib2.Request(url, headers={'User-Agent' : 'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/32.0.1667.0 Safari/537.36'})
+    site = urllib2.urlopen(request)
+    html = site.read()
 
-parsed_html = BeautifulSoup(html)
+    parsed_html = BeautifulSoup(html)
 
-dishes = parsed_html.body.find_all('div', attrs={'class' : 'flipwrapper'})
+    dishes = parsed_html.body.find_all('div', attrs={'class' : 'flipwrapper'})
 
-#chosen = choice(dishes)
+    client = MongoClient('localhost', 27017)
+    db = client.recipeasy
+    collection = db.recipes
+    recipes = db.recipes
 
-'''print chosen.attrs['data-sharetitle']
-print chosen.find('section', attrs={'class' : 'description'}).text'''
-#img = chosen.find('a', attrs={'class' : 'picture-link'})
-'''print img.attrs['href']
-print img.find('img').attrs['src']'''
+    for dish in dishes:
+        img = dish.find('a', attrs={'class' : 'picture-link'})
 
-client = MongoClient('localhost', 27017)
-db = client.recipeasy
-collection = db.recipes
-recipes = db.recipes
+        recipe = { 'title' : dish.attrs['data-sharetitle'],
+                   'description' : dish.find('section', attrs={'class' : 'description'}).text,
+                   'link' : img.attrs['href'],
+                   'image' : img.find('img').attrs['src'] }
 
-for dish in dishes:
-    img = dish.find('a', attrs={'class' : 'picture-link'})
+        recipes.insert(recipe)
 
-    recipe = { 'title' : chosen.attrs['data-sharetitle'],
-               'description' : chosen.find('section', attrs={'class' : 'description'}).text,
-               'link' : img.attrs['href'],
-               'image' : img.find('img').attrs['src'] }
-
-    recipes.insert(recipe)
+    amtDone = float(x)/float(maxpage)
+    print("\rProgress: [{0:100s}] {1:.1f}% ({2}/{3})".format('#' * int(amtDone * 50), amtDone * 100, x, maxpage)),
