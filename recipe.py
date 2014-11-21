@@ -1,10 +1,20 @@
 from flask import Flask, render_template, request
 from bs4 import BeautifulSoup
 import urllib2
-from random import choice,randint
+import random
 import os
+from flask.ext.pymongo import PyMongo
+import time
 
 app = Flask(__name__, static_url_path='')
+
+app.config['MONGO_HOST'] = 'localhost'
+app.config['MONGO_PORT'] = 27017
+app.config['MONGO_DBNAME'] = 'recipeasy'
+app.config['MONGO_USERNAME'] = 'recip'
+app.config['MONGO_PASSWORD'] = 'sleazy'
+
+mongo = PyMongo(app, config_prefix='MONGO')
 
 class Recipe():
   """docstring for Recipe"""
@@ -18,7 +28,7 @@ class Recipe():
 @app.route('/')
 def recipe(name=None):
 
-  filter_params = request.args.get('filter', '')
+  '''filter_params = request.args.get('filter', '')
   print 'filter =', filter_params
 
   maxpage = 17000
@@ -51,8 +61,17 @@ def recipe(name=None):
   description = chosen.find('section', attrs={'class' : 'description'}).text
   img = chosen.find('a', attrs={'class' : 'picture-link'})
   link = img.attrs['href']
-  image = img.find('img').attrs['src']
-  recipe_info = Recipe(name, description, image, link)
+  image = img.find('img').attrs['src']'''
+
+  collection = mongo.db.recipes
+  numRecipes = collection.count()
+
+  random.seed(time.time())
+  randRecipe = random.randint(1, numRecipes)
+  
+  recipe = collection.find().limit(-1).skip(randRecipe).next()
+
+  recipe_info = Recipe(recipe['title'], recipe['description'], recipe['image'], recipe['link'])
 
   return render_template('result.html', recipe_data=recipe_info)
 
